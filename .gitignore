@@ -1,4 +1,7 @@
 node_modules/
 preview-*.png
 recon-*.png
+live-*.png
 *.log
+package.json
+package-lock.json
