@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lisa &amp; Lane · 23 September 2026</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+  :root{color-scheme:dark}
+  body{margin:0;background:#0f1f3d;color:#f3e9c6;font-family:Georgia,"Times New Roman",serif;text-align:center;padding:2rem 1rem}
+  h1{font-weight:normal;font-size:2rem;margin:.5rem 0 0} h2{font-weight:normal;font-style:italic;font-size:1.1rem;margin:2rem 0 .5rem}
+  .sub{font-style:italic;opacity:.85} video{width:min(100%,420px);aspect-ratio:9/16;background:#000;border-radius:8px}
+  form{margin-top:3rem} input{font:inherit;font-size:1.1rem;padding:.6rem .8rem;border-radius:6px;border:1px solid #f3e9c6;background:#0b1730;color:#f3e9c6;width:min(80%,280px)}
+  button{font:inherit;font-size:1.1rem;padding:.6rem 1.2rem;margin-left:.5rem;border-radius:6px;border:1px solid #f3e9c6;background:#f3e9c6;color:#0f1f3d;cursor:pointer}
+  #err{color:#ffb4a2;min-height:1.4em;margin-top:.8rem}
+</style></head><body>
+<div id="gate">
+  <h1>Lisa &amp; Lane</h1>
+  <p class="sub">Wednesday, the twenty-third of September</p>
+  <form id="f"><input id="pw" type="password" placeholder="password" autocomplete="off" autofocus><button type="submit">Open</button></form>
+  <div id="err"></div>
+</div>
+<div id="content" hidden></div>
+<script>
+const SALT="bPlXoXiNO+LayqlR6/yy1w==", IV="kVXUI5IN/KpWoUWa", CT="FvRpTcLvOhKlzPWxKYsHp8uZ65esspbRl1/Z0A0Tnpc5TNwq+HHtSDIUV4DwXkpHOrci9O4M9OQ7sEYMSszAK7dAbe6Kcu2Ti/f0RTRoGGaN4BnYrpo7CEAhnXgMRLlxWf6YiYlxFAA4NzWWjUIz1zUXyg7eNPDSSt9irNpIuDGUDOi0g5fANIWUkDDGl4qz6uRUm9XXNubxS3Y6bMwpFM6r4sYXLOqJUt47jd9LSTLlsfw3yaFsWfzm3YHbvQJwFUSbZJjkv5etx2vxBU4FvvlbbDuJAm2OVlvHdlL09Z1vgbfQBXNuZMCi5UeRZ7RjGVK44/SD8jOj3/VKLbdB6ibuM43vVHtVJcHZilgAjK887d5OugcZNaxjK/G4wJrVmARnGuSCjYyEDTFFo7fR/KwvYVgW8Z+0/0UiZcpr+EC5qBxgwJi/G7/7lQEhkhqZWgkXHrsESzb4rYWDRmw3hBPh8Wf1BpatVYt6D2LvWwRHS9+KVzk78X0hAgnTdH2SVlPfHDAcWHMarOHNVep9bFdzplvrDbo/kmvg6BDlXu7rdLm3KP3oreeVxPS9CFsJ9apo3/hFpgsEajgPRJPbKSHpRIIGNzmz39SvMZLroKJel5G3TrGIgSgop65cwaorF2UZfPe7TMkSDTdWNLRuoedL73maBP32w0JAbV/Ok+rxMTF7QcE0X27EEquM88p6Gue4";
+const u=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function open(pw){
+  const base=await crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveKey"]);
+  const key=await crypto.subtle.deriveKey({name:"PBKDF2",salt:u(SALT),iterations:200000,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["decrypt"]);
+  const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:u(IV)},key,u(CT));
+  return new TextDecoder().decode(pt);
+}
+document.getElementById("f").addEventListener("submit",async e=>{
+  e.preventDefault(); const err=document.getElementById("err"); err.textContent="";
+  try{ const html=await open(document.getElementById("pw").value.trim());
+    document.getElementById("content").innerHTML=html; document.getElementById("content").hidden=false; document.getElementById("gate").hidden=true;
+    try{sessionStorage.setItem("w23",document.getElementById("pw").value.trim())}catch(_){}
+  }catch(_){ err.textContent="That's not it. Ask Lisa."; }
+});
+try{ const s=sessionStorage.getItem("w23"); if(s){ document.getElementById("pw").value=s; document.getElementById("f").requestSubmit(); } }catch(_){}
+</script></body></html>
